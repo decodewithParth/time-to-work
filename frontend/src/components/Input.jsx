@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RiAddLine } from "react-icons/ri";
 
-function Input({ capturedTime }) {
+function Input({ capturedTime, onAddClick }) {
   const [isClicked, setIsClicked] = useState(false);
   const [input, setInput] = useState("");
 
@@ -11,6 +11,8 @@ function Input({ capturedTime }) {
 
   const handleButtonClick = () => {
     setIsClicked(!isClicked);
+    onAddClick(input); // Call the parent's function
+    setInput(""); // Clear the input
   };
 
   return (
@@ -34,13 +36,13 @@ function Input({ capturedTime }) {
       >
         <RiAddLine size={28} />
       </button>
-      {isClicked && capturedTime && input && (
+      {/* {isClicked && capturedTime && input && (
         <div className="text-black mt-4">
           <h4 className="font-semibold">Captured Time:</h4>
           <p>{`${input}`}</p>
           <p>{`${capturedTime.hours}:${capturedTime.minutes}:${capturedTime.seconds}`}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

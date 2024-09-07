@@ -5,10 +5,12 @@ import { LuTimerReset } from "react-icons/lu";
 import Input from "./Input";
 
 function StopWatch() {
-  const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
-  const [capturedTime,setCapturedTime]=useState(null);
-  const [isRunning, setIsRunning] = useState(false);
-  const [activeButton, setActiveButton] = useState(""); // this state is used to track the active button for css animaiton
+  const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });  // to set the time of stop watch
+  const [capturedTime, setCapturedTime] = useState(null);  // to store the captured value of time of stop watch
+  const [isRunning, setIsRunning] = useState(false);  // to check that is stop watch is running or not
+  const [activeButton, setActiveButton] = useState("");  // to store the active state of stop watch button
+  const [showInput, setShowInput] = useState(false);  // to show the input components or not
+  const [capturedInputs, setCapturedInputs] = useState([]);  // to store the input component value and time 
   const timeRef = useRef(null);
 
   const handleStart = () => {
@@ -32,6 +34,7 @@ function StopWatch() {
           return { hours, minutes, seconds };
         });
       }, 1000);
+      setShowInput(false);
     }
   };
 
@@ -41,6 +44,7 @@ function StopWatch() {
       clearInterval(timeRef.current);
       setCapturedTime(time);
       setIsRunning(false);
+      setShowInput(true);
     }
   };
 
@@ -49,6 +53,20 @@ function StopWatch() {
     clearInterval(timeRef.current);
     setIsRunning(false);
     setTime({ hours: 0, minutes: 0, seconds: 0 });
+    setShowInput(false);
+    // setCapturedInputs([]);
+  };
+
+  const handleAddClick = (inputValue) => {
+    setShowInput(false);
+    if (inputValue) {
+      setCapturedInputs((prev) => [
+        ...prev,
+        { text: inputValue, time: { ...time } },
+      ]);
+    }
+    setTime({ hours: 0, minutes: 0, seconds: 0 });
+    setActiveButton("");
   };
 
   const formatTime = (timeValue) =>
@@ -97,8 +115,27 @@ function StopWatch() {
         </button>
       </div>
       <div className="py-4 w-full h-auto">
-        {activeButton=="stop" ? <Input capturedTime={capturedTime}/> : ""}
+        {showInput && (
+          <Input capturedTime={capturedTime} onAddClick={handleAddClick} />
+        )}
       </div>
+      {capturedInputs.length > 0 && (
+        <div className="mt-8 w-full max-w-md">
+          <h3 className="text-2xl font-semibold mb-4">Captured Inputs:</h3>
+          <ul className="space-y-2">
+            {capturedInputs.map((item, index) => (
+              <li key={index} className="bg-gray-100 p-3 rounded-md">
+                <p className="font-semibold">{item.text}</p>
+                <p className="text-sm text-gray-600">
+                  Time: {formatTime(item.time.hours)}:
+                  {formatTime(item.time.minutes)}:
+                  {formatTime(item.time.seconds)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
