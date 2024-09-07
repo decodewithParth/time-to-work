@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { VscDebugStart } from "react-icons/vsc";
 import { FaSquare } from "react-icons/fa6";
 import { LuTimerReset } from "react-icons/lu";
+import Input from "./Input";
 
 function StopWatch() {
   const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
@@ -92,6 +93,9 @@ function StopWatch() {
           <LuTimerReset className="mr-2" />
           <span>Reset</span>
         </button>
+      </div>
+      <div className="py-4 w-full h-auto">
+        {activeButton=="stop" ? <Input/> : ""}
       </div>
     </div>
   );
