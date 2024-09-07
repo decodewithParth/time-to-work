@@ -6,6 +6,7 @@ import Input from "./Input";
 
 function StopWatch() {
   const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [capturedTime,setCapturedTime]=useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [activeButton, setActiveButton] = useState(""); // this state is used to track the active button for css animaiton
   const timeRef = useRef(null);
@@ -38,6 +39,7 @@ function StopWatch() {
     setActiveButton("stop");
     if (isRunning) {
       clearInterval(timeRef.current);
+      setCapturedTime(time);
       setIsRunning(false);
     }
   };
@@ -95,7 +97,7 @@ function StopWatch() {
         </button>
       </div>
       <div className="py-4 w-full h-auto">
-        {activeButton=="stop" ? <Input/> : ""}
+        {activeButton=="stop" ? <Input capturedTime={capturedTime}/> : ""}
       </div>
     </div>
   );
