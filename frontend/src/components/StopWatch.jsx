@@ -1,17 +1,49 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VscDebugStart } from "react-icons/vsc";
 import { FaSquare } from "react-icons/fa6";
 import { LuTimerReset } from "react-icons/lu";
 import Input from "./Input";
 
 function StopWatch() {
-  const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });  // to set the time of stop watch
-  const [capturedTime, setCapturedTime] = useState(null);  // to store the captured value of time of stop watch
-  const [isRunning, setIsRunning] = useState(false);  // to check that is stop watch is running or not
-  const [activeButton, setActiveButton] = useState("");  // to store the active state of stop watch button
-  const [showInput, setShowInput] = useState(false);  // to show the input components or not
-  const [capturedInputs, setCapturedInputs] = useState([]);  // to store the input component value and time 
+  const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 }); // to set the time of stop watch
+  const [capturedTime, setCapturedTime] = useState(null); // to store the captured value of time of stop watch
+  const [isRunning, setIsRunning] = useState(false); // to check that is stop watch is running or not
+  const [activeButton, setActiveButton] = useState(""); // to store the active state of stop watch button
+  const [showInput, setShowInput] = useState(false); // to show the input components or not
+  const [capturedInputs, setCapturedInputs] = useState([]); // to store the input component value and time
   const timeRef = useRef(null);
+
+  useEffect(() => {
+    const storedInputs = localStorage.getItem("capturedInputs");
+    if (storedInputs) {
+      setCapturedInputs(JSON.parse(storedInputs));
+    }
+  }, []);
+
+  useEffect(() => {
+    // const storedInputs=localStorage.getItem("time");
+    localStorage.setItem("capturedInputs", JSON.stringify(capturedInputs));
+  }, [capturedInputs]);
+
+  function getCurrentTimeAndDate() {
+    const now = new Date();
+    const date = now.toLocaleDateString();
+
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+    const formattedTime = `${hours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    return { date, formattedTime };
+  }
 
   const handleStart = () => {
     setActiveButton("start");
@@ -54,15 +86,22 @@ function StopWatch() {
     setIsRunning(false);
     setTime({ hours: 0, minutes: 0, seconds: 0 });
     setShowInput(false);
-    // setCapturedInputs([]);
+    setCapturedInputs([]);
+    localStorage.removeItem("time");
   };
 
   const handleAddClick = (inputValue) => {
+    const { date, formattedTime } = getCurrentTimeAndDate();
     setShowInput(false);
     if (inputValue) {
       setCapturedInputs((prev) => [
         ...prev,
-        { text: inputValue, time: { ...time } },
+        {
+          text: inputValue,
+          workTime: { ...time },
+          workTimeStamp: formattedTime,
+          workDate: date,
+        },
       ]);
     }
     setTime({ hours: 0, minutes: 0, seconds: 0 });
@@ -127,10 +166,14 @@ function StopWatch() {
               <li key={index} className="bg-gray-100 p-3 rounded-md">
                 <p className="font-semibold">{item.text}</p>
                 <p className="text-sm text-gray-600">
-                  Time: {formatTime(item.time.hours)}:
-                  {formatTime(item.time.minutes)}:
-                  {formatTime(item.time.seconds)}
+                  Time: {formatTime(item.workTime.hours)}:
+                  {formatTime(item.workTime.minutes)}:
+                  {formatTime(item.workTime.seconds)}
                 </p>
+                <p className="text-sm text-gray-600">
+                  TimeStamp : {item.workTimeStamp}
+                </p>
+                <p className="text-sm text-gray-600">Date : {item.workDate}</p>
               </li>
             ))}
           </ul>
